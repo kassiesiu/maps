@@ -5,6 +5,7 @@ import Row from './Row';
 import request from '../api/request';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
+import convertToHoursAndMinutes from '../utils/convert-time';
 
 const acc = 'pk.eyJ1Ijoia2Fzc2lld29uZyIsImEiOiJjandvZmozNTcwbjE2NDhxcXJkdDk4cTQzIn0.M_IAIl2WS48X0B_yAeiGww';
 
@@ -25,7 +26,7 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { results: [], places: [] };
+    this.state = { results: [], places: [], duration: 0 };
 
     this.search = this.search.bind(this);
     this.addToPlaces = this.addToPlaces.bind(this);
@@ -63,34 +64,55 @@ class App extends Component {
 
   retrieveDirections() {
     const { places } = this.state;
-    const coordinates = places.map(({ center }) => center.join(',')).join(';');
-    request(`directions/v5/mapbox/driving/${coordinates}?annotations=duration&overview=full&geometries=geojson&`, (res) => {
-      const [routes] = res.routes;
-      this.map.addSource('route', {
-        type: 'geojson',
-        data: {
+    const stringifiedCoordinates = places.map(({ center }) => center.join(',')).join(';');
+
+    request(`directions/v5/mapbox/driving/${stringifiedCoordinates}?annotations=duration&overview=full&geometries=geojson&`, (res) => {
+      const [route] = res.routes;
+
+      this.setState({ duration: route.duration });
+      const line = this.map.getSource('route');
+
+      if (!line) {
+        this.map.addSource('route', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: route.geometry,
+          },
+        });
+
+        this.map.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#BBDC2F',
+            'line-width': 4,
+          },
+        });
+      } else {
+        line.setData({
           type: 'Feature',
           properties: {},
-          geometry: routes.geometry,
-        },
-      });
-      this.map.addLayer({
-        id: 'route',
-        type: 'line',
-        source: 'route',
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#BBDC2F',
-          'line-width': 4,
-        },
-      });
+          geometry: route.geometry,
+        });
+      }
 
-      this.map.fitBounds(
-        places.map(({ center }) => center),
+      const { coordinates } = route.geometry;
+
+      const boundss = coordinates.reduce(
+        (bounds, coord) => bounds.extend(coord),
+        new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]),
       );
+
+      this.map.fitBounds(boundss, {
+        padding: 40,
+      });
 
       places.forEach(({ center }, index) => {
         new mapboxgl.Marker(App.createMarker(index + 1))
@@ -108,12 +130,14 @@ class App extends Component {
   }
 
   render() {
+    const { duration } = this.state;
     return (
       <div className="App">
         <div className="left-side">
           <input onChange={this.search} />
           {this.renderResults()}
           <button onClick={this.retrieveDirections} type="button">Retrieve Directions</button>
+          <div>{convertToHoursAndMinutes(duration)}</div>
         </div>
 
         <div id="map" className="map" />
