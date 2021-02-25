@@ -1,15 +1,25 @@
-/* eslint-disable react/jsx-filename-extension */
 import React, { Component } from 'react';
 import mapboxgl from 'mapbox-gl';
-import Row from './Row';
-import request from '../api/request';
+import Row from '../Row/Row';
+import Search from '../Search/Search';
+import request from '../../api/request';
+import convertToHoursAndMinutes from '../../utils/convert-time';
+
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
-import convertToHoursAndMinutes from '../utils/convert-time';
 
 const acc = 'pk.eyJ1Ijoia2Fzc2lld29uZyIsImEiOiJjandvZmozNTcwbjE2NDhxcXJkdDk4cTQzIn0.M_IAIl2WS48X0B_yAeiGww';
 
 class App extends Component {
+  static thing() {
+    fetch('https://www.wikidata.org/wiki/Q83443')
+      .then((res) => res.json())
+      .then(
+        (res) => console.log(res),
+        (error) => console.log(error),
+      );
+  }
+
   static createMarker(text) {
     const marker = document.createElement('div');
     marker.className = 'marker';
@@ -37,13 +47,13 @@ class App extends Component {
     this.map = new mapboxgl.Map({
       accessToken: acc,
       container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v11',
+      style: 'mapbox://styles/kassiewong/cklersodi4c3a17rzyjwptw61',
       center: [-115.1492, 36.1663],
       zoom: 9,
     });
   }
 
-  search({ target: { value } }) {
+  search(value) {
     if (value.length < 3) {
       return;
     }
@@ -67,6 +77,11 @@ class App extends Component {
     const stringifiedCoordinates = places.map(({ center }) => center.join(',')).join(';');
 
     request(`directions/v5/mapbox/driving/${stringifiedCoordinates}?annotations=duration&overview=full&geometries=geojson&`, (res) => {
+      if (res.code === 'InvalidInput') {
+        console.log('error');
+        return;
+      }
+
       const [route] = res.routes;
 
       this.setState({ duration: route.duration });
@@ -134,7 +149,7 @@ class App extends Component {
     return (
       <div className="App">
         <div className="left-side">
-          <input onChange={this.search} />
+          <Search onChange={this.search} />
           {this.renderResults()}
           <button onClick={this.retrieveDirections} type="button">Retrieve Directions</button>
           <div>{convertToHoursAndMinutes(duration)}</div>

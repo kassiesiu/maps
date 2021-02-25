@@ -1,0 +1,23 @@
+.Search {
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  width: 200px;
+  display: flex;
+  align-items: center;
+}
+
+input {
+  border: none;
+  width: 100%;
+}
+
+input:focus {
+  outline-style: none;
+  box-shadow: none;
+}
+
+.icon {
+  color: black;
+  margin-right: 10px;
+}
