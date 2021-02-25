@@ -1,0 +1,12 @@
+.Row {
+  display: flex;
+  align-items: center;
+  background-color: #292929;
+  margin: 10px 0;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.name {
+  font-weight: bolder;
+}

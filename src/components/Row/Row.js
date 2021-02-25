@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+
+import "./Row.css";
 
 class Row extends Component {
   constructor(props) {
@@ -16,13 +18,13 @@ class Row extends Component {
     const { item } = this.props;
     return (
       <div className="Row">
-        <div>
-          <span className="name">{item.place_name}</span>
-          {item.properties.address}
-          {item.properties.foursquare}
-        </div>
+        <span className="name">{item.place_name}</span>
+        {item.address}
+        {item.foursquare}
 
-        <button onClick={this.addToPlaces} type="button">Add</button>
+        <button onClick={this.addToPlaces} type="button">
+          Add
+        </button>
       </div>
     );
   }
@@ -31,10 +33,8 @@ class Row extends Component {
 Row.propTypes = {
   item: PropTypes.shape({
     place_name: PropTypes.string,
-    properties: PropTypes.shape({
-      address: PropTypes.string,
-      foursquare: PropTypes.string,
-    }),
+    address: PropTypes.string,
+    foursquare: PropTypes.string,
   }),
   onAddToPlaces: PropTypes.func,
 };

@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import PropTypes from 'prop-types';
-import './Search.css';
+import React, { Component } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import PropTypes from "prop-types";
+import "./Search.css";
 
 class Search extends Component {
   constructor(props) {
@@ -21,14 +21,18 @@ class Search extends Component {
     return (
       <div className="Search">
         <FontAwesomeIcon className="icon" icon={faSearch} />
-        <input className="input" placeholder={placeholder} onChange={this.change} />
+        <input
+          className="input"
+          placeholder={placeholder}
+          onChange={this.change}
+        />
       </div>
     );
   }
 }
 
 Search.propTypes = {
-  placeholder: '',
+  placeholder: "",
   onChange: () => {},
 };
 
