@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
-import "./Search.css";
+import styles from "./Search.module.css";
 
 class Search extends Component {
   constructor(props) {
@@ -33,10 +33,10 @@ class Search extends Component {
     if (!items.length) return "";
 
     return (
-      <div className="container-items">
+      <div className={styles.containerItems}>
         {items.map((item, index) => (
           <div
-            className="item"
+            className={styles.item}
             role="button"
             name="hello"
             index={index}
@@ -54,11 +54,11 @@ class Search extends Component {
   render() {
     const { placeholder } = this.props;
     return (
-      <div className="container-search">
-        <div className="Search">
-          <FontAwesomeIcon className="icon" icon={faSearch} />
+      <div>
+        <div id="thing" className={styles.Search}>
+          <FontAwesomeIcon className={styles.icon} icon={faSearch} />
           <input
-            className="input"
+            className={styles.input}
             placeholder={placeholder}
             onChange={this.change}
           />

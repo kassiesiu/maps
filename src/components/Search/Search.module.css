@@ -22,7 +22,7 @@ input:focus {
   margin-right: 10px;
 }
 
-.container-items {
+.containerItems {
   display: flex;
   flex-direction: column;
   max-width: 40%;

@@ -1,12 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import "./Button.css";
+import styles from "./Button.module.css";
 
 class Button extends Component {
   constructor(props) {
     super(props);
-
     this.click = this.click.bind(this);
   }
 
@@ -18,7 +17,7 @@ class Button extends Component {
   render() {
     const { label } = this.props;
     return (
-      <button className="Button" onClick={this.click} type="button">
+      <button className={styles.Button} onClick={this.click} type="button">
         {label}
       </button>
     );

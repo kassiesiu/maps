@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import "./Row.css";
+import styles from "./Row.module.css";
 
 class Row extends Component {
   constructor(props) {
@@ -17,8 +17,8 @@ class Row extends Component {
   render() {
     const { item } = this.props;
     return (
-      <div className="Row">
-        <span className="name">{item.place_name}</span>
+      <div className={styles.Row}>
+        <span className={styles.name}>{item.place_name}</span>
         {item.address}
         {item.foursquare}
 

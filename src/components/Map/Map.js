@@ -2,17 +2,17 @@
 import React, { Component } from "react";
 import mapboxgl from "mapbox-gl";
 import PropTypes, { number } from "prop-types";
-import "./Map.css";
-import "mapbox-gl/dist/mapbox-gl.css";
 import equal from "fast-deep-equal";
+import styles from "./Map.module.css";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 class Map extends Component {
   static createMarker(text) {
     const marker = document.createElement("div");
-    marker.className = "marker";
+    marker.className = styles.marker;
 
     const innerMarker = document.createElement("div");
-    innerMarker.className = "marker-after";
+    innerMarker.className = styles.markerAfter;
     innerMarker.innerText = text;
 
     marker.appendChild(innerMarker);
@@ -100,7 +100,7 @@ class Map extends Component {
   }
 
   render() {
-    return <div id="map" className="Map" />;
+    return <div id="map" className={styles.Map} />;
   }
 }
 

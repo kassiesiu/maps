@@ -3,6 +3,7 @@ import Row from "../Row/Row";
 import Search from "../Search/Search";
 import Button from "../Button/Button";
 import Map from "../Map/Map";
+import Route from "../Route/Route";
 import request from "../../api/request";
 import convertToHoursAndMinutes from "../../utils/convert-time";
 
@@ -13,23 +14,18 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { results: [], places: [], duration: 0 };
+    this.state = { searchResults: [], addedPlaces: [], duration: 0 };
 
     this.search = this.search.bind(this);
     this.addToPlaces = this.addToPlaces.bind(this);
     this.retrieveDirections = this.retrieveDirections.bind(this);
   }
 
-  setDuration(duration) {
-    this.setState({
-      duration,
-    });
-  }
-
   search(value) {
     request(`geocoding/v5/mapbox.places/${value}.json?`, (res) => {
       const formattedRes = res.features.map((feature) => ({
         place_name: feature.place_name,
+        text: feature.text,
         address: feature.properties.address,
         foursquare: feature.properties.foursquare,
         wikidata: feature.properties.wikidata,
@@ -37,22 +33,22 @@ class App extends Component {
       }));
 
       this.setState({
-        results: formattedRes,
+        searchResults: formattedRes,
       });
     });
   }
 
   addToPlaces(item) {
-    const { places } = this.state;
+    const { addedPlaces } = this.state;
     this.setState({
-      places: [...places, item],
-      results: [],
+      addedPlaces: [...addedPlaces, item],
+      searchResults: [],
     });
   }
 
   retrieveDirections() {
-    const { places } = this.state;
-    const stringifiedCoordinates = places
+    const { addedPlaces } = this.state;
+    const stringifiedCoordinates = addedPlaces
       .map(({ center }) => center.join(","))
       .join(";");
 
@@ -65,27 +61,31 @@ class App extends Component {
 
         const [route] = res.routes;
 
+        this.setState({
+          duration: route.duration,
+        });
+
         this.setState({ route });
       }
     );
   }
 
-  renderResults() {
-    const { results } = this.state;
+  renderSearchResults() {
+    const { searchResults } = this.state;
 
-    return results.map((item) => (
+    return searchResults.map((item) => (
       <Row item={item} onAddToPlaces={this.addToPlaces} />
     ));
   }
 
   render() {
-    const { duration, results, route, places } = this.state;
+    const { duration, searchResults, route, addedPlaces } = this.state;
     return (
       <div className="App">
-        <div className="left-side">
+        <div>
           <Search
             placeholder="Search"
-            items={results}
+            items={searchResults}
             onChange={this.search}
             onClick={this.addToPlaces}
           />
@@ -94,9 +94,10 @@ class App extends Component {
             onClick={this.retrieveDirections}
           />
           <div>{convertToHoursAndMinutes(duration)}</div>
+          <Route places={addedPlaces} />
         </div>
 
-        <Map route={route} places={places} />
+        <Map route={route} places={addedPlaces} />
       </div>
     );
   }
