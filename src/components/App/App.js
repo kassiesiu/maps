@@ -8,8 +8,7 @@ import convertToHoursAndMinutes from "../../utils/convert-time";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./App.css";
 
-const acc =
-  "pk.eyJ1Ijoia2Fzc2lld29uZyIsImEiOiJjandvZmozNTcwbjE2NDhxcXJkdDk4cTQzIn0.M_IAIl2WS48X0B_yAeiGww";
+const acc = process.env.REACT_APP_MAP_BOX_API_KEY;
 
 class App extends Component {
   static createMarker(text) {
@@ -56,6 +55,7 @@ class App extends Component {
         address: feature.properties.address,
         foursquare: feature.properties.foursquare,
         wikidata: feature.properties.wikidata,
+        center: feature.center,
       }));
 
       this.setState({
@@ -156,7 +156,7 @@ class App extends Component {
         <div className="left-side">
           <Search onChange={this.search} />
           {this.renderResults()}
-          <button onClick={App.thing} type="button">
+          <button onClick={this.retrieveDirections} type="button">
             Retrieve Directions
           </button>
           <div>{convertToHoursAndMinutes(duration)}</div>

@@ -1,5 +1,4 @@
-const acc =
-  "pk.eyJ1Ijoia2Fzc2lld29uZyIsImEiOiJjandvZmozNTcwbjE2NDhxcXJkdDk4cTQzIn0.M_IAIl2WS48X0B_yAeiGww";
+const acc = process.env.MAP_BOX_API_KEY;
 
 const request = (route, callback) => {
   fetch(`https://api.mapbox.com/${route}access_token=${acc}`)
