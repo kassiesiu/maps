@@ -1,7 +1,7 @@
 .Search {
   padding: 10px;
   background-color: white;
-  border-radius: 5px;
+  border-radius: 20px;
   width: 200px;
   display: flex;
   align-items: center;
@@ -20,4 +20,25 @@ input:focus {
 .icon {
   color: black;
   margin-right: 10px;
+}
+
+.container-items {
+  display: flex;
+  flex-direction: column;
+  max-width: 40%;
+  background-color: #292929;
+  border-radius: 20px;
+  margin-top: 10px;
+  padding: 15px 0;
+}
+
+.item {
+  padding: 15px;
+  cursor: pointer;
+  margin: 0 10px;
+  border-radius: 10px;
+}
+
+.item:hover {
+  background-color: #1f1f1f;
 }

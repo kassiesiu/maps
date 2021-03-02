@@ -1,0 +1,31 @@
+.Map {
+  position: absolute !important;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 50%;
+  height: 100%;
+}
+
+.marker {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 3px #b1b1b1;
+}
+
+.marker-after {
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: bolder;
+  width: 20px;
+  height: 20px;
+  margin: 5px 0 0 5px;
+  background: black;
+  position: absolute;
+  border-radius: 50%;
+}
