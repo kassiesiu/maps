@@ -8,8 +8,6 @@ import convertToHoursAndMinutes from "../../utils/convert-time";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./App.css";
 
-const acc = process.env.REACT_APP_MAP_BOX_API_KEY;
-
 class App extends Component {
   static createMarker(text) {
     const marker = document.createElement("div");
@@ -36,7 +34,7 @@ class App extends Component {
 
   componentDidMount() {
     this.map = new mapboxgl.Map({
-      accessToken: acc,
+      accessToken: process.env.REACT_APP_MAP_BOX_API_KEY,
       container: "map",
       style: "mapbox://styles/kassiewong/cklersodi4c3a17rzyjwptw61",
       center: [-115.1492, 36.1663],
