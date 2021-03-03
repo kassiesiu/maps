@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from "react";
 import mapboxgl from "mapbox-gl";
-import PropTypes, { number } from "prop-types";
+import PropTypes from "prop-types";
 import equal from "fast-deep-equal";
 import styles from "./Map.module.css";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -27,12 +27,19 @@ class Map extends Component {
   }
 
   componentDidMount() {
+    const { center } = this.props;
     this.map = new mapboxgl.Map({
       accessToken: process.env.REACT_APP_MAP_BOX_API_KEY,
       container: "map",
       style: "mapbox://styles/kassiewong/cklersodi4c3a17rzyjwptw61",
-      center: [-115.1492, 36.1663],
+      center,
       zoom: 9,
+    });
+
+    this.map.on("drag", () => {
+      const { onChange } = this.props;
+
+      onChange(this.map.getCenter());
     });
   }
 
@@ -43,10 +50,12 @@ class Map extends Component {
     }
   }
 
+  getCenter() {
+    return this.map.getCenter();
+  }
+
   updateMap() {
     const { route, places } = this.props;
-
-    console.log("route :>> ", route);
 
     const line = this.map.getSource("route");
 
@@ -105,19 +114,23 @@ class Map extends Component {
 }
 
 Map.propTypes = {
+  center: PropTypes.arrayOf(PropTypes.number),
   route: PropTypes.shape({
     geometry: PropTypes.shape({
-      coordinates: PropTypes.arrayOf(PropTypes.arrayOf(number)),
+      coordinates: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
     }),
   }),
+  onChange: PropTypes.func,
 };
 
 Map.defaultProps = {
+  center: [],
   route: {
     geometry: {
       coordinates: [],
     },
   },
+  onChange: () => {},
 };
 
 export default Map;

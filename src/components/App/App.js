@@ -14,28 +14,43 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { searchResults: [], addedPlaces: [], duration: 0 };
+    this.state = {
+      searchResults: [],
+      addedPlaces: [],
+      duration: 0,
+      center: [-115.1492, 36.1663],
+    };
 
     this.search = this.search.bind(this);
+    this.setCenter = this.setCenter.bind(this);
     this.addToPlaces = this.addToPlaces.bind(this);
     this.retrieveDirections = this.retrieveDirections.bind(this);
   }
 
-  search(value) {
-    request(`geocoding/v5/mapbox.places/${value}.json?`, (res) => {
-      const formattedRes = res.features.map((feature) => ({
-        place_name: feature.place_name,
-        text: feature.text,
-        address: feature.properties.address,
-        foursquare: feature.properties.foursquare,
-        wikidata: feature.properties.wikidata,
-        center: feature.center,
-      }));
+  setCenter({ lng, lat }) {
+    this.setState({ center: [lng, lat] });
+  }
 
-      this.setState({
-        searchResults: formattedRes,
-      });
-    });
+  search(value) {
+    const { center } = this.state;
+
+    request(
+      `geocoding/v5/mapbox.places/${value}.json?proximity=${center[0]},${center[1]}&`,
+      (res) => {
+        const formattedRes = res.features.map((feature) => ({
+          place_name: feature.place_name,
+          text: feature.text,
+          address: feature.properties.address,
+          foursquare: feature.properties.foursquare,
+          wikidata: feature.properties.wikidata,
+          center: feature.center,
+        }));
+
+        this.setState({
+          searchResults: formattedRes,
+        });
+      }
+    );
   }
 
   addToPlaces(item) {
@@ -79,7 +94,7 @@ class App extends Component {
   }
 
   render() {
-    const { duration, searchResults, route, addedPlaces } = this.state;
+    const { duration, searchResults, route, addedPlaces, center } = this.state;
     return (
       <div className="App">
         <div>
@@ -97,7 +112,12 @@ class App extends Component {
           <Route places={addedPlaces} />
         </div>
 
-        <Map route={route} places={addedPlaces} />
+        <Map
+          route={route}
+          places={addedPlaces}
+          center={center}
+          onChange={this.setCenter}
+        />
       </div>
     );
   }
