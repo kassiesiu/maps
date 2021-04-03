@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
 import styles from "./Search.module.css";
+import { addedPlaces } from "../../utils/prop-types";
 
 class Search extends Component {
   constructor(props) {
@@ -71,22 +72,14 @@ class Search extends Component {
 
 Search.propTypes = {
   placeholder: PropTypes.string,
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      address: PropTypes.string,
-      center: PropTypes.arrayOf(PropTypes.number),
-      foursquare: PropTypes.string,
-      place_name: PropTypes.string,
-      wikidata: PropTypes.string,
-    })
-  ),
+  items: addedPlaces.propTypes,
   onChange: PropTypes.func,
   onClick: PropTypes.func,
 };
 
 Search.defaultProps = {
   placeholder: "",
-  items: [],
+  items: addedPlaces.default,
   onChange: () => {},
   onClick: () => {},
 };

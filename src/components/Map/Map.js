@@ -5,6 +5,8 @@ import PropTypes from "prop-types";
 import equal from "fast-deep-equal";
 import styles from "./Map.module.css";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { addedPlaces } from "../../utils/prop-types";
+import request from "../../api/request";
 
 class Map extends Component {
   static createMarker(text) {
@@ -39,73 +41,90 @@ class Map extends Component {
     this.map.on("drag", () => {
       const { onChange } = this.props;
 
-      onChange(this.map.getCenter());
+      onChange("bounds", this.map.getBounds());
     });
   }
 
   componentDidUpdate(prevProps) {
-    const { route } = this.props;
-    if (!equal(prevProps.route, route)) {
+    const { places } = this.props;
+    if (!equal(prevProps.places, places)) {
       this.updateMap();
     }
   }
 
-  getCenter() {
-    return this.map.getCenter();
-  }
-
   updateMap() {
-    const { route, places } = this.props;
+    const { places, onChange } = this.props;
 
-    const line = this.map.getSource("route");
-
-    if (!line) {
-      this.map.addSource("route", {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          properties: {},
-          geometry: route.geometry,
-        },
-      });
-
-      this.map.addLayer({
-        id: "route",
-        type: "line",
-        source: "route",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#BBDC2F",
-          "line-width": 4,
-        },
-      });
-    } else {
-      line.setData({
-        type: "Feature",
-        properties: {},
-        geometry: route.geometry,
-      });
+    if (places.length < 2) {
+      return;
     }
 
-    const { coordinates } = route.geometry;
+    const stringifiedCoordinates = places
+      .map(({ center }) => center.join(","))
+      .join(";");
 
-    const boundss = coordinates.reduce(
-      (bounds, coord) => bounds.extend(coord),
-      new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
+    request(
+      `directions/v5/mapbox/driving/${stringifiedCoordinates}?annotations=duration&overview=full&geometries=geojson&`,
+      (res) => {
+        if (res.code === "InvalidInput") {
+          return;
+        }
+
+        const [route] = res.routes;
+
+        onChange("duration", route.duration);
+
+        const line = this.map.getSource("route");
+
+        if (!line) {
+          this.map.addSource("route", {
+            type: "geojson",
+            data: {
+              type: "Feature",
+              properties: {},
+              geometry: route.geometry,
+            },
+          });
+
+          this.map.addLayer({
+            id: "route",
+            type: "line",
+            source: "route",
+            layout: {
+              "line-join": "round",
+              "line-cap": "round",
+            },
+            paint: {
+              "line-color": "#BBDC2F",
+              "line-width": 4,
+            },
+          });
+        } else {
+          line.setData({
+            type: "Feature",
+            properties: {},
+            geometry: route.geometry,
+          });
+        }
+
+        const { coordinates } = route.geometry;
+
+        const bounds = coordinates.reduce(
+          (acc, coord) => acc.extend(coord),
+          new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
+        );
+
+        this.map.fitBounds(bounds, {
+          padding: 40,
+        });
+
+        places.forEach(({ center }, index) => {
+          new mapboxgl.Marker(Map.createMarker(index + 1))
+            .setLngLat(center)
+            .addTo(this.map);
+        });
+      }
     );
-
-    this.map.fitBounds(boundss, {
-      padding: 40,
-    });
-
-    places.forEach(({ center }, index) => {
-      new mapboxgl.Marker(Map.createMarker(index + 1))
-        .setLngLat(center)
-        .addTo(this.map);
-    });
   }
 
   render() {
@@ -114,6 +133,7 @@ class Map extends Component {
 }
 
 Map.propTypes = {
+  places: addedPlaces.propTypes,
   center: PropTypes.arrayOf(PropTypes.number),
   route: PropTypes.shape({
     geometry: PropTypes.shape({
@@ -124,6 +144,7 @@ Map.propTypes = {
 };
 
 Map.defaultProps = {
+  places: addedPlaces.default,
   center: [],
   route: {
     geometry: {
